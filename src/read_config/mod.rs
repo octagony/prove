@@ -1,27 +1,27 @@
-use serde::Deserialize;
+use serde::{Deserialize,Serialize};
 use std::fs;
 use std::process::exit;
 use toml;
 
-#[derive(Deserialize)]
+
+#[derive(Deserialize,Serialize)]
 pub struct Data {
     config: Config,
 }
 
-#[derive(Deserialize)]
-pub struct Config {
-    ip: String,
-    port: u16,
+#[derive(Deserialize,Serialize)]
+struct Config {
+    api_key: String,
+    city: String,
 }
+
 
 impl Data {
     pub fn read_file(filename: &str) {
         let contents = match fs::read_to_string(filename) {
             Ok(c) => c,
             Err(_) => {
-                // IMPLEMENT CREATE_FILE FUNCTION
-                eprintln!("Could not read file `{}`", filename);
-                exit(1);
+              self::Data::create_file(filename)
             }
         };
 
@@ -33,11 +33,31 @@ impl Data {
             }
         };
 
-        println!("{}", data.config.ip);
-        println!("{}", data.config.port);
+        println!("{}",data.config.api_key);
+        println!("{}",data.config.city);
     }
 
     // IMPLEMENT CREATE_FILE FUNCTION
-    pub fn create_file() {}
+    pub fn create_file(filename:&str)->String {
+        let config = Self{
+            config:Config { api_key: "test_api".to_string(), city: "Minsk".to_string() }
+        };
+        let config = toml::to_string(&config).unwrap();
+        match fs::write(filename, config){
+            Ok(_data)=>(),
+            Err(_)=>{
+                eprintln!("Unable to create config file");
+                exit(1);
+            }
+        }
+        let contents = match fs::read_to_string(filename) {
+            Ok(c) => c,
+            Err(_) => {
+               eprintln!("Unable to read file");
+               exit(1);
+            }
+        };
+        contents
+    }
 }
 
