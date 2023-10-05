@@ -1,18 +1,23 @@
-mod read_config;
+use serde::{Deserialize,Serialize};
+mod config;
+use config::Data;
+mod api;
+use api::schema::Schema::WeatherMap;
 
 #[tokio::main]
 async fn main() -> Result<(), reqwest::Error> {
-    // TEST READ TOML FILE
-    read_config::Data::read_file("test.toml");
-    // TEST CALL TO JSON PLACEHOLDER
-    // let posts = reqwest::Client::new()
-    // .get("https://jsonplaceholder.typicode.com/posts?userId=1")
-    // .send()
-    // .await?
-    // .text()
-    // .await?;
+    let data =Data::read_file("prove.toml");
 
-    // println!("{:#?}",posts);
+    let format_url = format!("https://api.openweathermap.org/data/2.5/weather?q={}&APPID={}",data.config.city,data.config.api_key);
+
+    let response:WeatherMap = reqwest::Client::new()
+    .get(format_url)
+    .send()
+    .await?
+    .json()
+    .await?;
+
+    println!("{:#?}",response);
 
     Ok(())
 }

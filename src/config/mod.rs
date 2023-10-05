@@ -4,20 +4,19 @@ use std::process::exit;
 use toml;
 
 
-#[derive(Deserialize,Serialize)]
+#[derive(Deserialize,Serialize,Debug)]
 pub struct Data {
-    config: Config,
+   pub config: Config,
 }
 
-#[derive(Deserialize,Serialize)]
-struct Config {
-    api_key: String,
-    city: String,
+#[derive(Deserialize,Serialize,Debug)]
+pub struct Config {
+    pub api_key: String,
+    pub city: String,
 }
-
 
 impl Data {
-    pub fn read_file(filename: &str) {
+    pub fn read_file(filename: &str)->Self {
         let contents = match fs::read_to_string(filename) {
             Ok(c) => c,
             Err(_) => {
@@ -32,13 +31,10 @@ impl Data {
                 exit(1);
             }
         };
-
-        println!("{}",data.config.api_key);
-        println!("{}",data.config.city);
+        data
     }
 
-    // IMPLEMENT CREATE_FILE FUNCTION
-    pub fn create_file(filename:&str)->String {
+     fn create_file(filename:&str)->String {
         let config = Self{
             config:Config { api_key: "test_api".to_string(), city: "Minsk".to_string() }
         };
