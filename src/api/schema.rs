@@ -1,7 +1,6 @@
-pub mod Schema{
-	use serde::{Deserialize,Serialize};
-	#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
-	#[serde(rename_all = "camelCase")]
+use serde::{Deserialize, Serialize};
+#[derive(Default, Debug, Clone, PartialEq, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct WeatherMap {
     pub coord: Coord,
     pub weather: Vec<Weather>,
@@ -75,5 +74,4 @@ pub struct Sys {
     pub country: String,
     pub sunrise: i64,
     pub sunset: i64,
-}
 }
