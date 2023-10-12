@@ -1,8 +1,7 @@
 use crate::env::enviroment;
 use serde::{Deserialize, Serialize};
-use std::fmt::Display;
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::Path;
 use std::process::exit;
 use toml;
 
@@ -15,6 +14,7 @@ pub struct Data {
 pub struct Config {
     pub api_key: String,
     pub city: String,
+    pub units: String,
 }
 
 impl Data {
@@ -26,8 +26,9 @@ impl Data {
 
         let data: Data = match toml::from_str(&contents) {
             Ok(d) => d,
-            Err(_) => {
-                eprintln!("Unable to load data from `{}`", filepath);
+            Err(err) => {
+                eprintln!("{:?}", err.message());
+                // eprintln!("Unable to load data from `{}`", filepath);
                 exit(1);
             }
         };
@@ -39,6 +40,7 @@ impl Data {
             config: Config {
                 api_key: "test_api".to_string(),
                 city: "Minsk".to_string(),
+                units: "metric".to_string(),
             },
         };
 

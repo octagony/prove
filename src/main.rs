@@ -1,29 +1,30 @@
 mod api;
 mod config;
 mod env;
-use api::schema::WeatherMap;
 use config::Data;
+use uts2ts::{uts2ts, Timestamp};
 
 #[tokio::main]
 async fn main() -> Result<(), reqwest::Error> {
-    let path = config::Data::check_config_file();
-    let prove = path.expect("Unable to load prove.toml");
+    let result = api::schema::WeatherMap::get_info().await?;
+    //Print Place
+    println!("Place: {},{}", result.sys.country, result.name);
 
-    println!("{}:{}", prove.config.api_key, prove.config.city);
+    //Print Weather #TODO Implement metric
+    println!(
+        "Weather: {},{}°",
+        result.weather.get(0).unwrap().main,
+        result.main.temp
+    );
 
-    // let format_url = format!(
-    //     "https://api.openweathermap.org/data/1.5/weather?q={}&APPID={}",
-    //     prove.config.city, prove.config.api_key
-    // );
+    //Print Wind speed #TODO Implement metric
+    println!("Wind speed: {} m/s", result.wind.speed);
+
+    //Print Sunrise/Sunset #TODO Implement convertation
+    // let sunrise_convert: Timestamp = uts2ts(result.sys.sunrise);
+    // let sunset_convert: Timestamp = uts2ts(result.sys.sunset);
     //
-    // let response: WeatherMap = reqwest::Client::new()
-    //     .get(format_url)
-    //     .send()
-    //     .await?
-    //     .json()
-    //     .await?;
-    //
-    // println!("{:#?}", response);
-    //
+    // println!("Sunrise: {:?}", sunrise_convert);
+    // println!("Sunset: {:?}", sunset_convert);
     Ok(())
 }
