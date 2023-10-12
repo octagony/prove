@@ -1,5 +1,6 @@
 use crate::env::enviroment;
 use serde::{Deserialize, Serialize};
+use std::fmt::Display;
 use std::fs;
 use std::path::{Path, PathBuf};
 use std::process::exit;
@@ -17,7 +18,7 @@ pub struct Config {
 }
 
 impl Data {
-    pub fn read_file(filepath: &str) -> Self {
+    fn read_file(filepath: &str) -> Self {
         let contents = match fs::read_to_string(filepath) {
             Ok(c) => c,
             Err(_) => self::Data::create_file(filepath),
@@ -30,7 +31,6 @@ impl Data {
                 exit(1);
             }
         };
-        println!("{}", data.config.api_key);
         data
     }
 
@@ -41,7 +41,10 @@ impl Data {
                 city: "Minsk".to_string(),
             },
         };
+
         let config = toml::to_string(&config).unwrap();
+
+        println!("{}", filepath);
         match fs::write(filepath, config) {
             Ok(_data) => (),
             Err(_) => {
@@ -58,20 +61,18 @@ impl Data {
         };
         contents
     }
-    pub fn check_config_file() {
+    pub fn check_config_file() -> std::io::Result<Self> {
         let config_dir = enviroment::read_env();
+        let format_path = format!("{}/prove/", config_dir);
 
-        let prove_dir = format!("{}/prove", config_dir);
-        let prove_file = format!("{}/prove/prove.toml", config_dir);
+        let prove_dir = Path::new(&format_path);
 
-        let check_path = Path::new(&prove_dir);
-
-        let is_exist = check_path.exists();
-
-        if is_exist {
-            Self::read_file(&prove_file);
-        } else {
-            Self::create_file(&prove_file);
+        if !prove_dir.exists() {
+            fs::create_dir_all(format!("{}/prove", config_dir))?;
         }
+
+        Ok(Self::read_file(
+            prove_dir.join("prove.toml").to_str().unwrap(),
+        ))
     }
 }
