@@ -28,7 +28,6 @@ impl Data {
             Ok(d) => d,
             Err(err) => {
                 eprintln!("{:?}", err.message());
-                // eprintln!("Unable to load data from `{}`", filepath);
                 exit(1);
             }
         };
@@ -44,9 +43,8 @@ impl Data {
             },
         };
 
-        let config = toml::to_string(&config).unwrap();
+        let config = toml::to_string(&config).expect("Unable to read prove.toml file");
 
-        println!("{}", filepath);
         match fs::write(filepath, config) {
             Ok(_data) => (),
             Err(_) => {
@@ -74,7 +72,10 @@ impl Data {
         }
 
         Ok(Self::read_file(
-            prove_dir.join("prove.toml").to_str().unwrap(),
+            prove_dir
+                .join("prove.toml")
+                .to_str()
+                .expect("Unable to retrieve data from prove.toml file"),
         ))
     }
 }

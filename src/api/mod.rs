@@ -1,7 +1,7 @@
 pub mod schema;
 use crate::Data;
 use schema::WeatherMap;
-use uts2ts::{uts2ts, Timestamp};
+use uts2ts::uts2ts;
 
 impl WeatherMap {
     pub async fn get_info() -> Result<WeatherMap, reqwest::Error> {
@@ -35,8 +35,14 @@ impl WeatherMap {
         let sunrise_convert: Vec<&str> = sunrise_convert.split(" ").collect();
         let sunset_convert: Vec<&str> = sunset_convert.split(" ").collect();
 
-        let get_sunrise = sunrise_convert.get(1).unwrap().to_string();
-        let get_sunset = sunset_convert.get(1).unwrap().to_string();
+        let get_sunrise = sunrise_convert
+            .get(1)
+            .expect("Unable to retrieve sunrise data")
+            .to_string();
+        let get_sunset = sunset_convert
+            .get(1)
+            .expect("Unable to retrieve sunsrise data")
+            .to_string();
 
         (get_sunrise, get_sunset)
     }
@@ -47,7 +53,10 @@ impl WeatherMap {
         //Print Weather #TODO Implement metric
         println!(
             "Weather: {},{}°",
-            data.weather.get(0).unwrap().main,
+            data.weather
+                .get(0)
+                .expect("Unable to retrieve weather data")
+                .main,
             data.main.temp
         );
 
@@ -60,7 +69,7 @@ impl WeatherMap {
             data.timezone,
         );
 
-        //Print Wind speed
+        //Print Sunrise/Sunset
         println!("Sunrise: {}", sunsrise);
         println!("Sunset: {}", sunset);
     }
