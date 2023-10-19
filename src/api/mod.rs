@@ -1,6 +1,7 @@
 pub mod schema;
 use crate::Data;
 use schema::WeatherMap;
+use uts2ts::{uts2ts, Timestamp};
 
 impl WeatherMap {
     pub async fn get_info() -> Result<WeatherMap, reqwest::Error> {
@@ -20,5 +21,47 @@ impl WeatherMap {
             .await?;
 
         Ok(response)
+    }
+
+    pub fn convert_sunrise_and_sunshine(
+        sunrise: i64,
+        sunset: i64,
+        timezone: i64,
+    ) -> (String, String) {
+        // Print Sunrise/Sunset #TODO Implement convertation
+        let sunrise_convert = &uts2ts(sunrise + (timezone)).as_string();
+        let sunset_convert = &uts2ts(sunset + (timezone)).as_string();
+
+        let sunrise_convert: Vec<&str> = sunrise_convert.split(" ").collect();
+        let sunset_convert: Vec<&str> = sunset_convert.split(" ").collect();
+
+        let get_sunrise = sunrise_convert.get(1).unwrap().to_string();
+        let get_sunset = sunset_convert.get(1).unwrap().to_string();
+
+        (get_sunrise, get_sunset)
+    }
+    pub fn print_info(data: WeatherMap) {
+        //Print Place
+        println!("Place: {},{}", data.sys.country, data.name);
+
+        //Print Weather #TODO Implement metric
+        println!(
+            "Weather: {},{}°",
+            data.weather.get(0).unwrap().main,
+            data.main.temp
+        );
+
+        //Print Wind speed #TODO Implement metric
+        println!("Wind speed: {} m/s", data.wind.speed);
+
+        let (sunsrise, sunset) = self::WeatherMap::convert_sunrise_and_sunshine(
+            data.sys.sunrise,
+            data.sys.sunset,
+            data.timezone,
+        );
+
+        //Print Wind speed
+        println!("Sunrise: {}", sunsrise);
+        println!("Sunset: {}", sunset);
     }
 }

@@ -592,6 +592,7 @@ dependencies = [
  "serde",
  "tokio",
  "toml",
+ "uts2ts",
 ]
 
 [[package]]
@@ -1020,6 +1021,12 @@ dependencies = [
  "idna",
  "percent-encoding",
 ]
+
+[[package]]
+name = "uts2ts"
+version = "0.4.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "259b17235452d88d066e35685df3fd9fd3875936eee5451d0533b604201f06a8"
 
 [[package]]
 name = "vcpkg"
