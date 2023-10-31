@@ -6,6 +6,12 @@ use std::process::exit;
 use toml;
 
 #[derive(Deserialize, Serialize, Debug)]
+pub enum UnitsEnum {
+    Metric,
+    Imperial,
+}
+
+#[derive(Deserialize, Serialize, Debug)]
 pub struct Data {
     pub config: Config,
 }
@@ -14,13 +20,15 @@ pub struct Data {
 pub struct Config {
     pub api_key: String,
     pub city: String,
-    pub units: String,
+    pub units: UnitsEnum,
 }
 
 impl Data {
+    //Read config file
     fn read_file(filepath: &str) -> Self {
         let contents = match fs::read_to_string(filepath) {
             Ok(c) => c,
+            //If config file does not exist, create it
             Err(_) => self::Data::create_file(filepath),
         };
 
@@ -34,12 +42,13 @@ impl Data {
         data
     }
 
+    //Create config file
     fn create_file(filepath: &str) -> String {
         let config = Self {
             config: Config {
                 api_key: "test_api".to_string(),
                 city: "Minsk".to_string(),
-                units: "metric".to_string(),
+                units: UnitsEnum::Metric,
             },
         };
 
@@ -61,6 +70,8 @@ impl Data {
         };
         contents
     }
+
+    //Check configuration file, if exist -> read it, else -> create it
     pub fn check_config_file() -> std::io::Result<Self> {
         let config_dir = enviroment::read_env();
         let format_path = format!("{}/prove/", config_dir);

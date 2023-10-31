@@ -1,16 +1,15 @@
 pub mod schema;
-use crate::Data;
+use self::schema::Weather;
+use crate::config::{Config, Data, UnitsEnum};
 use schema::WeatherMap;
 use uts2ts::uts2ts;
 
 impl WeatherMap {
-    pub async fn get_info() -> Result<WeatherMap, reqwest::Error> {
-        let path = Data::check_config_file();
-        let prove = path.expect("Unable to load prove.toml");
-
+    // Get info from server
+    pub async fn get_info(config_file: &Data) -> Result<WeatherMap, reqwest::Error> {
         let format_url = format!(
-            "https://api.openweathermap.org/data/2.5/weather?q={}&APPID={}&units={}",
-            prove.config.city, prove.config.api_key, prove.config.units
+            "https://api.openweathermap.org/data/2.5/weather?q={}&APPID={}&units={:?}",
+            config_file.config.city, config_file.config.api_key, config_file.config.units
         );
 
         let response: WeatherMap = reqwest::Client::new()
@@ -23,7 +22,8 @@ impl WeatherMap {
         Ok(response)
     }
 
-    pub fn convert_sunrise_and_sunshine(
+    //Convert sunrise and sunset values
+    pub fn convert_sunrise_and_sunset(
         sunrise: i64,
         sunset: i64,
         timezone: i64,
@@ -41,36 +41,50 @@ impl WeatherMap {
             .to_string();
         let get_sunset = sunset_convert
             .get(1)
-            .expect("Unable to retrieve sunsrise data")
+            .expect("Unable to retrieve sunset data")
             .to_string();
 
         (get_sunrise, get_sunset)
     }
-    pub fn print_info(data: WeatherMap) {
+
+    // Convert weather info depending on config
+    pub fn get_weather(weather: String, temp: f64, config_file: &Data) -> String {
+        match config_file.config.units {
+            UnitsEnum::Metric => return format!("{weather}, {temp}°C"),
+            UnitsEnum::Imperial => return format!("{weather}, {temp}°F"),
+        }
+    }
+
+    // Convert wind info depending on config
+    pub fn get_wind_info(wind_speed: f64, config_file: &Data) -> String {
+        match config_file.config.units {
+            UnitsEnum::Metric => return format!("{} m/s", wind_speed),
+            UnitsEnum::Imperial => return format!("{} m/h", wind_speed),
+        }
+    }
+
+    //Print all info
+    pub fn print_info(
+        data: WeatherMap,
+        sunrise: String,
+        sunset: String,
+        weather_info: String,
+        wind_speed: String,
+    ) {
         //Print Place
-        println!("Place: {},{}", data.sys.country, data.name);
+        let (country, name) = (data.sys.country, data.name);
 
-        //Print Weather #TODO Implement metric
-        println!(
-            "Weather: {},{}°",
-            data.weather
-                .get(0)
-                .expect("Unable to retrieve weather data")
-                .main,
-            data.main.temp
-        );
+        //Print Weather
+        println!("City: {name}, {country}");
 
-        //Print Wind speed #TODO Implement metric
-        println!("Wind speed: {} m/s", data.wind.speed);
+        //Print Weather
+        println!("Weather: {weather_info}");
 
-        let (sunsrise, sunset) = self::WeatherMap::convert_sunrise_and_sunshine(
-            data.sys.sunrise,
-            data.sys.sunset,
-            data.timezone,
-        );
+        //Print Wind speed
+        println!("Wind speed: {wind_speed}");
 
         //Print Sunrise/Sunset
-        println!("Sunrise: {}", sunsrise);
-        println!("Sunset: {}", sunset);
+        println!("Sunrise: {sunrise}");
+        println!("Sunset: {sunset}");
     }
 }
