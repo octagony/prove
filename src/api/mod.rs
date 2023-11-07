@@ -1,6 +1,6 @@
 pub mod schema;
-use self::schema::Weather;
-use crate::config::{Config, Data, UnitsEnum};
+use crate::config::{Data, UnitsEnum};
+use colored::Colorize;
 use schema::WeatherMap;
 use uts2ts::uts2ts;
 
@@ -48,11 +48,11 @@ impl WeatherMap {
     }
 
     // Convert weather info depending on config
-    pub fn get_weather(weather: String, temp: f64, config_file: &Data) -> String {
+    pub fn get_weather(weather: &String, temp: f64, config_file: &Data) -> String {
         match config_file.config.units {
             UnitsEnum::Metric => return format!("{weather}, {temp}°C"),
             UnitsEnum::Imperial => return format!("{weather}, {temp}°F"),
-        }
+        };
     }
 
     // Convert wind info depending on config
@@ -70,21 +70,27 @@ impl WeatherMap {
         sunset: String,
         weather_info: String,
         wind_speed: String,
+        config_file: &Data,
     ) {
         //Print Place
         let (country, name) = (data.sys.country, data.name);
+        let (r, g, b) = (
+            config_file.config.color.0,
+            config_file.config.color.1,
+            config_file.config.color.2,
+        );
 
         //Print Weather
-        println!("City: {name}, {country}");
+        println!("{}: {name}, {country}", "City".truecolor(r, g, b));
 
         //Print Weather
-        println!("Weather: {weather_info}");
+        println!("{}: {weather_info}", "Weather".truecolor(r, g, b));
 
         //Print Wind speed
-        println!("Wind speed: {wind_speed}");
+        println!("{}: {wind_speed}", "Wind speed".truecolor(r, g, b));
 
         //Print Sunrise/Sunset
-        println!("Sunrise: {sunrise}");
-        println!("Sunset: {sunset}");
+        println!("{}: {sunrise}", "Sunrise".truecolor(r, g, b));
+        println!("{}: {sunset}", "Sunset".truecolor(r, g, b));
     }
 }

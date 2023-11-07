@@ -21,6 +21,7 @@ pub struct Config {
     pub api_key: String,
     pub city: String,
     pub units: UnitsEnum,
+    pub color: (u8, u8, u8),
 }
 
 impl Data {
@@ -49,6 +50,7 @@ impl Data {
                 api_key: "test_api".to_string(),
                 city: "Minsk".to_string(),
                 units: UnitsEnum::Metric,
+                color: (0, 255, 136),
             },
         };
 

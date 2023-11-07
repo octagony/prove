@@ -30,13 +30,20 @@ async fn main() -> Result<(), reqwest::Error> {
     );
 
     //Get weather info
-    let weather_info = WeatherMap::get_weather(weather_data, temp_data, &config_file);
+    let weather_info = WeatherMap::get_weather(&weather_data, temp_data, &config_file);
 
     //Get wind speed info
     let wind_speed_info = WeatherMap::get_wind_info(result.wind.speed, &config_file);
 
     //Print all info
-    WeatherMap::print_info(result, sunrise, sunset, weather_info, wind_speed_info);
+    WeatherMap::print_info(
+        result,
+        sunrise,
+        sunset,
+        weather_info,
+        wind_speed_info,
+        &config_file,
+    );
 
     Ok(())
 }
